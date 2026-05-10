@@ -24,17 +24,17 @@ part one/
 From the repository root:
 
 ```bash
-mkdir -p out
-javac -cp "jade/lib/jade.jar" -d out "part one"/src/auction/*.java
+mkdir -p "part one"/out
+javac -cp "jade/lib/jade.jar" -d "part one"/out "part one"/src/auction/*.java
 ```
 
 ## Run
 
 ```bash
-java -cp "out:jade/lib/jade.jar" auction.AuctionMain
+java -cp "part one/out:jade/lib/jade.jar" auction.AuctionMain
 ```
 
-> On Windows, replace `out:jade/lib/jade.jar` with `out;jade/lib/jade.jar`.
+> On Windows, replace `part one/out:jade/lib/jade.jar` with `part one/out;jade/lib/jade.jar`.
 
 ## Hardcoded parameters
 
