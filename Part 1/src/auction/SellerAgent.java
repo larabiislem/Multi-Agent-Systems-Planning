@@ -66,6 +66,12 @@ public class SellerAgent extends Agent {
             }
 
             Map.Entry<AID, Integer> highestEntry = findHighestBid(latestRoundBids);
+            if (highestEntry == null) {
+                AuctionLogger.info(getLocalName(), "No valid highest bid could be determined.");
+                finalizeAuction(null, currentPrice);
+                stop();
+                return;
+            }
             AID highestBidder = highestEntry.getKey();
             int highestBid = highestEntry.getValue();
 

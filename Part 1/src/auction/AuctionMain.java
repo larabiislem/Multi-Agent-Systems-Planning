@@ -23,9 +23,9 @@ public final class AuctionMain {
 
         try {
             mainContainer.createNewAgent("seller", SellerAgent.class.getName(), null).start();
-            mainContainer.createNewAgent("buyer1", BuyerAgent.class.getName(), new Object[] { "buyer1" }).start();
-            mainContainer.createNewAgent("buyer2", BuyerAgent.class.getName(), new Object[] { "buyer2" }).start();
-            mainContainer.createNewAgent("buyer3", BuyerAgent.class.getName(), new Object[] { "buyer3" }).start();
+            mainContainer.createNewAgent("buyer1", BuyerAgent.class.getName(), null).start();
+            mainContainer.createNewAgent("buyer2", BuyerAgent.class.getName(), null).start();
+            mainContainer.createNewAgent("buyer3", BuyerAgent.class.getName(), null).start();
         } catch (StaleProxyException e) {
             System.err.println("Failed to launch agents: " + e.getMessage());
             e.printStackTrace();
