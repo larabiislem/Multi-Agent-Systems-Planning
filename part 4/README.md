@@ -1,11 +1,11 @@
-# JADE Blocks World Planner (Repo 4)
+# JADE Blocks World Planner (Part 4)
 
 Centralized planner with distributed execution for the classic blocks-world domain. A planner agent builds a plan and a coordinator dispatches each step to block agents while a Swing GUI visualizes the world state.
 
 ## Project structure
 
 ```text
-repo 4/
+part 4/
 ├─ src/
 │  └─ blocks/
 │     ├─ BlocksWorldMain.java
@@ -37,17 +37,17 @@ repo 4/
 From the repository root:
 
 ```bash
-mkdir -p "repo 4"/out
-javac -cp "jade/lib/jade.jar" -d "repo 4"/out "repo 4"/src/blocks/*.java
+mkdir -p "part 4"/out
+javac -cp "jade/lib/jade.jar" -d "part 4"/out "part 4"/src/blocks/*.java
 ```
 
 ## Run
 
 ```bash
-java -cp "repo 4/out:jade/lib/jade.jar" blocks.BlocksWorldMain
+java -cp "part 4/out:jade/lib/jade.jar" blocks.BlocksWorldMain
 ```
 
-> On Windows, replace `repo 4/out:jade/lib/jade.jar` with `repo 4/out;jade/lib/jade.jar`.
+> On Windows, replace `part 4/out:jade/lib/jade.jar` with `part 4/out;jade/lib/jade.jar`.
 
 ## Notes
 
