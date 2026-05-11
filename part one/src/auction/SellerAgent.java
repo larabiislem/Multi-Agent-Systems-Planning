@@ -120,7 +120,8 @@ public class SellerAgent extends Agent {
 
             String winnerName = null;
             boolean hasBids = !lastBids.isEmpty();
-            if (currentPrice >= RESERVE_PRICE && hasBids) {
+            boolean metReserve = currentPrice >= RESERVE_PRICE;
+            if (metReserve && hasBids) {
                 // Winner is the highest bidder in the last round
                 AID winner = lastBids.entrySet()
                         .stream()
@@ -140,7 +141,7 @@ public class SellerAgent extends Agent {
                 }
             } else if (!hasBids) {
                 AuctionLogger.info(getLocalName(), "No bids received.");
-            } else {
+            } else if (!metReserve) {
                 AuctionLogger.info(getLocalName(), "Reserve price not met. No sale.");
             }
 
@@ -152,12 +153,10 @@ public class SellerAgent extends Agent {
 
             if (model != null) {
                 String status;
-                if (currentPrice >= RESERVE_PRICE && winnerName != null) {
+                if (winnerName != null) {
                     status = "Sold to " + winnerName + " for " + currentPrice;
                 } else if (!hasBids) {
                     status = "No bids received.";
-                } else if (currentPrice >= RESERVE_PRICE) {
-                    status = "Reserve met, but no valid bids.";
                 } else {
                     status = "Reserve price not met. No sale.";
                 }
