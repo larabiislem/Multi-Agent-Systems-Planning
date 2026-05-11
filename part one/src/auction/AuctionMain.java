@@ -5,6 +5,8 @@ import jade.core.ProfileImpl;
 import jade.core.Runtime;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
+import java.util.concurrent.atomic.AtomicReference;
+import javax.swing.SwingUtilities;
 
 /**
  * Bootstraps JADE runtime and starts Seller + Buyers.
@@ -12,6 +14,10 @@ import jade.wrapper.StaleProxyException;
 public class AuctionMain {
 
     public static void main(String[] args) {
+        AuctionModel model = new AuctionModel(AuctionMessages.AUCTION_ITEM);
+        AuctionFrame frame = createFrame(model);
+        AuctionLogger.setLogListener(frame::log);
+
         Runtime rt = Runtime.instance();
         Profile profile = new ProfileImpl();
         profile.setParameter(Profile.GUI, "true"); // RMA + GUI tools
@@ -19,7 +25,7 @@ public class AuctionMain {
 
         try {
             // Seller
-            container.createNewAgent("seller", SellerAgent.class.getName(), null).start();
+            container.createNewAgent("seller", SellerAgent.class.getName(), new Object[]{model}).start();
 
             // Buyers
             container.createNewAgent("buyer1", BuyerAgent.class.getName(), new Object[]{"buyer1"}).start();
@@ -29,5 +35,19 @@ public class AuctionMain {
         } catch (StaleProxyException e) {
             e.printStackTrace();
         }
+    }
+
+    private static AuctionFrame createFrame(AuctionModel model) {
+        AtomicReference<AuctionFrame> frameRef = new AtomicReference<>();
+        try {
+            SwingUtilities.invokeAndWait(() -> {
+                AuctionFrame frame = new AuctionFrame(model);
+                frame.setVisible(true);
+                frameRef.set(frame);
+            });
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to start GUI", e);
+        }
+        return frameRef.get();
     }
 }

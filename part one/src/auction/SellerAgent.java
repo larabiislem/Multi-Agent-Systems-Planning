@@ -6,7 +6,9 @@ import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,10 +29,19 @@ public class SellerAgent extends Agent {
 
     private final List<AID> buyers = new ArrayList<>();
     private final Map<AID, Integer> lastBids = new HashMap<>();
+    private AuctionModel model;
 
     @Override
     protected void setup() {
+        Object[] args = getArguments();
+        if (args != null && args.length > 0 && args[0] instanceof AuctionModel) {
+            model = (AuctionModel) args[0];
+        }
+
         AuctionLogger.info(getLocalName(), "Seller ready. Item: " + AUCTION_ITEM);
+        if (model != null) {
+            model.updateRound(round, currentPrice, Collections.emptyMap(), "Auction starting.");
+        }
         discoverBuyers();
         addBehaviour(new AuctionCycle(this, 2000)); // 2s per round
     }
@@ -50,6 +61,9 @@ public class SellerAgent extends Agent {
         protected void onTick() {
             round++;
             AuctionLogger.info(getLocalName(), "Round " + round + " starting. Current price: " + currentPrice);
+            if (model != null) {
+                model.updateRound(round, currentPrice, Collections.emptyMap(), "Collecting bids.");
+            }
 
             // 1) Send CFP to all buyers
             ACLMessage cfp = new ACLMessage(ACLMessage.CFP);
@@ -96,12 +110,18 @@ public class SellerAgent extends Agent {
             send(info);
 
             AuctionLogger.info(getLocalName(), "Highest bid this round: " + currentPrice);
+            if (model != null) {
+                model.updateRound(round, currentPrice, snapshotBids(), "Highest bid: " + currentPrice);
+            }
         }
 
         private void endAuction() {
             AuctionLogger.info(getLocalName(), "Auction ended. Final price: " + currentPrice);
 
-            if (currentPrice >= RESERVE_PRICE) {
+            String winnerName = null;
+            boolean hasBids = !lastBids.isEmpty();
+            boolean metReserve = currentPrice >= RESERVE_PRICE;
+            if (metReserve && hasBids) {
                 // Winner is the highest bidder in the last round
                 AID winner = lastBids.entrySet()
                         .stream()
@@ -116,9 +136,12 @@ public class SellerAgent extends Agent {
                     accept.setContent("Winner: " + winner.getLocalName() + " price=" + currentPrice);
                     send(accept);
 
-                    AuctionLogger.info(getLocalName(), "Sold to " + winner.getLocalName() + " for " + currentPrice);
+                    winnerName = winner.getLocalName();
+                    AuctionLogger.info(getLocalName(), "Sold to " + winnerName + " for " + currentPrice);
                 }
-            } else {
+            } else if (!hasBids) {
+                AuctionLogger.info(getLocalName(), "No bids received.");
+            } else if (!metReserve) {
                 AuctionLogger.info(getLocalName(), "Reserve price not met. No sale.");
             }
 
@@ -127,6 +150,26 @@ public class SellerAgent extends Agent {
             for (AID b : buyers) end.addReceiver(b);
             end.setContent("Auction finished. Final price=" + currentPrice);
             send(end);
+
+            if (model != null) {
+                String status;
+                if (winnerName != null) {
+                    status = "Sold to " + winnerName + " for " + currentPrice;
+                } else if (!hasBids) {
+                    status = "No bids received.";
+                } else {
+                    status = "Reserve price not met. No sale.";
+                }
+                model.finish(status, winnerName, currentPrice, snapshotBids());
+            }
+        }
+
+        private Map<String, Integer> snapshotBids() {
+            Map<String, Integer> snapshot = new LinkedHashMap<>();
+            for (Map.Entry<AID, Integer> entry : lastBids.entrySet()) {
+                snapshot.put(entry.getKey().getLocalName(), entry.getValue());
+            }
+            return snapshot;
         }
     }
 }
