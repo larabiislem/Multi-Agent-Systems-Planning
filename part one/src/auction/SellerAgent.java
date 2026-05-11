@@ -118,10 +118,10 @@ public class SellerAgent extends Agent {
         private void endAuction() {
             AuctionLogger.info(getLocalName(), "Auction ended. Final price: " + currentPrice);
 
-            AID winner = null;
+            String winnerName = null;
             if (currentPrice >= RESERVE_PRICE) {
                 // Winner is the highest bidder in the last round
-                winner = lastBids.entrySet()
+                AID winner = lastBids.entrySet()
                         .stream()
                         .max(Map.Entry.comparingByValue())
                         .map(Map.Entry::getKey)
@@ -134,7 +134,8 @@ public class SellerAgent extends Agent {
                     accept.setContent("Winner: " + winner.getLocalName() + " price=" + currentPrice);
                     send(accept);
 
-                    AuctionLogger.info(getLocalName(), "Sold to " + winner.getLocalName() + " for " + currentPrice);
+                    winnerName = winner.getLocalName();
+                    AuctionLogger.info(getLocalName(), "Sold to " + winnerName + " for " + currentPrice);
                 } else {
                     AuctionLogger.info(getLocalName(), "No valid bids to accept.");
                 }
@@ -149,7 +150,6 @@ public class SellerAgent extends Agent {
             send(end);
 
             if (model != null) {
-                String winnerName = winner == null ? null : winner.getLocalName();
                 String status;
                 if (currentPrice >= RESERVE_PRICE && winnerName != null) {
                     status = "Sold to " + winnerName + " for " + currentPrice;

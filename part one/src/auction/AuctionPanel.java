@@ -72,7 +72,7 @@ public final class AuctionPanel extends JPanel {
             return;
         }
 
-        int barCount = bids.size();
+        int barCount = Math.max(1, bids.size());
         int barHeight = Math.max(24, (availableHeight - BAR_GAP * (barCount + 1)) / barCount);
         int y = top + BAR_GAP;
         int maxBid = snapshot.getCurrentPrice();
