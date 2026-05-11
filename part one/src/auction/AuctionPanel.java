@@ -59,12 +59,14 @@ public final class AuctionPanel extends JPanel {
 
     private void drawBids(Graphics2D g2, AuctionModel.Snapshot snapshot, int width, int height) {
         Map<String, Integer> bids = snapshot.getLastBids();
-        int availableHeight = height - HEADER_HEIGHT - MARGIN;
         int top = HEADER_HEIGHT;
 
         g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 15f));
         g2.setColor(Color.DARK_GRAY);
         g2.drawString("Latest bids", MARGIN, top);
+        int labelHeight = g2.getFontMetrics().getHeight();
+        int startY = top + labelHeight;
+        int availableHeight = height - startY - MARGIN;
 
         if (bids.isEmpty()) {
             g2.setColor(Color.GRAY);
@@ -74,26 +76,27 @@ public final class AuctionPanel extends JPanel {
 
         int barCount = Math.max(1, bids.size());
         int barHeight = Math.max(24, (availableHeight - BAR_GAP * (barCount + 1)) / barCount);
-        int y = top + BAR_GAP;
+        int y = startY + BAR_GAP;
         int maxBid = snapshot.getCurrentPrice();
         for (int bid : bids.values()) {
             maxBid = Math.max(maxBid, bid);
         }
+        int scale = Math.max(1, maxBid);
 
         for (Map.Entry<String, Integer> entry : bids.entrySet()) {
             String bidder = entry.getKey();
             int bid = entry.getValue();
             Color color = colorFor(bidder);
-            int barWidth = (int) ((width - MARGIN * 2) * (bid / (double) Math.max(1, maxBid)));
+            int barWidth = (int) ((width - MARGIN * 2) * (bid / (double) scale));
 
             g2.setColor(color);
-            g2.fillRoundRect(MARGIN, y + BAR_GAP, barWidth, barHeight, 10, 10);
+            g2.fillRoundRect(MARGIN, y, barWidth, barHeight, 10, 10);
             g2.setColor(Color.DARK_GRAY);
-            g2.drawRoundRect(MARGIN, y + BAR_GAP, barWidth, barHeight, 10, 10);
+            g2.drawRoundRect(MARGIN, y, barWidth, barHeight, 10, 10);
 
             String label = bidder + ": " + bid;
             g2.setColor(Color.BLACK);
-            g2.drawString(label, MARGIN + 10, y + BAR_GAP + barHeight - 6);
+            g2.drawString(label, MARGIN + 10, y + barHeight - 6);
 
             y += barHeight + BAR_GAP;
         }
