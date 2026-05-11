@@ -10,7 +10,10 @@ part one/
 │     ├─ SellerAgent.java
 │     ├─ BuyerAgent.java
 │     ├─ AuctionMessages.java
-│     └─ AuctionLogger.java
+│     ├─ AuctionLogger.java
+│     ├─ AuctionModel.java
+│     ├─ AuctionPanel.java
+│     └─ AuctionFrame.java
 └─ README.md
 ```
 
@@ -35,6 +38,10 @@ java -cp "part one/out:jade/lib/jade.jar" auction.AuctionMain
 ```
 
 > On Windows, replace `part one/out:jade/lib/jade.jar` with `part one/out;jade/lib/jade.jar`.
+
+## Notes
+
+- A Swing auction dashboard (matching the style of Part 4) opens alongside the JADE RMA GUI.
 
 ## Hardcoded parameters
 
